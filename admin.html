@@ -60,6 +60,47 @@
       font-weight: 600;
     }
 
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-drive {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-drive:hover { background: #1558c0; transform: translateY(-1px); }
+    .btn-drive svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .drive-tip {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #166534;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .drive-tip svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+    .drive-tip strong { display: block; margin-bottom: 2px; font-size: 13px; }
+    .drive-tip ol { margin: 4px 0 0 16px; }
+    .drive-tip li { margin-bottom: 2px; }
+
     /* ── LAYOUT ── */
     .wrapper {
       max-width: 1000px;
@@ -488,7 +529,20 @@
     </div>
     <span class="logo-text">True<span>Mate</span> Group</span>
   </div>
-  <span class="topbar-badge">Panel de Asesor</span>
+  <div class="topbar-right">
+    <button class="btn-drive" id="btnDrive" onclick="abrirCarpetaDrive()">
+      <svg viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H.01c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+        <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0-1.2 4.5h27.5z" fill="#00ac47"/>
+        <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 10.2z" fill="#ea4335"/>
+        <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2H34.4c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+        <path d="m59.8 53H32.5L18.75 76.8c1.35.8 2.9 1.2 4.5 1.2h45.5c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+        <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25 59.8 53h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+      </svg>
+      Carpeta de Videos
+    </button>
+    <span class="topbar-badge">Panel de Asesor</span>
+  </div>
 </header>
 
 <div class="wrapper">
@@ -530,6 +584,17 @@
       </div>
       <div class="form-group full">
         <label>Link del video en Google Drive <span class="label-hint">*</span></label>
+        <div class="drive-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>
+            <strong>¿Cómo obtener el link?</strong>
+            <ol>
+              <li>Abre tu carpeta de Drive (botón arriba a la derecha)</li>
+              <li>Click derecho sobre el video → <strong>Share → Copy link</strong></li>
+              <li>Pega el link aquí abajo</li>
+            </ol>
+          </div>
+        </div>
         <input type="text" id="clienteVideo" placeholder="https://drive.google.com/file/d/XXXXX/view" />
         <span class="input-help">Pega el link de "Compartir" de Google Drive. Lo convierto automáticamente.</span>
       </div>
@@ -581,6 +646,35 @@
   // ── CONFIG ──────────────────────────────────────────────────────────────────
   const BASE_URL = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
   const STORAGE_KEY = 'truemate_clientes';
+  const DRIVE_KEY  = 'truemate_drive_folder';
+
+  // ── DRIVE FOLDER ─────────────────────────────────────────────────────────────
+  function abrirCarpetaDrive() {
+    let url = localStorage.getItem(DRIVE_KEY);
+    if (!url) {
+      url = prompt('Pega el link de tu carpeta de Google Drive donde guardas los videos:\n(Solo se guarda aquí en tu navegador, no se comparte con nadie)');
+      if (!url || !url.trim()) return;
+      url = url.trim();
+      localStorage.setItem(DRIVE_KEY, url);
+    }
+    window.open(url, '_blank');
+  }
+
+  // Long-press on the Drive button to change the folder
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btnDrive');
+    if (!btn) return;
+    let holdTimer;
+    btn.addEventListener('mousedown', () => {
+      holdTimer = setTimeout(() => {
+        const current = localStorage.getItem(DRIVE_KEY) || '';
+        const url = prompt('Cambia el link de tu carpeta de Drive:', current);
+        if (url !== null) localStorage.setItem(DRIVE_KEY, url.trim());
+      }, 800);
+    });
+    btn.addEventListener('mouseup', () => clearTimeout(holdTimer));
+    btn.addEventListener('mouseleave', () => clearTimeout(holdTimer));
+  });
 
   // ── STORAGE ──────────────────────────────────────────────────────────────────
   function getClientes() {
