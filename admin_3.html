@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrueMate Group — Dashboard de Presentaciones</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f4f6fb;
+      min-height: 100vh;
+      color: #111;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0 28px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #1a56db, #0e3fa6);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg { width: 18px; height: 18px; fill: white; }
+
+    .logo-text { font-size: 15px; font-weight: 700; color: #111; }
+    .logo-text span { color: #1a56db; }
+
+    .topbar-badge {
+      background: #eff6ff;
+      color: #1a56db;
+      border: 1px solid #bfdbfe;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-drive {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-drive:hover { background: #1558c0; transform: translateY(-1px); }
+    .btn-drive svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .drive-tip {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #166534;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .drive-tip svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+    .drive-tip strong { display: block; margin-bottom: 2px; font-size: 13px; }
+    .drive-tip ol { margin: 4px 0 0 16px; }
+    .drive-tip li { margin-bottom: 2px; }
+
+    /* ── LAYOUT ── */
+    .wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .page-sub {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 28px;
+    }
+
+    /* ── NEW CLIENT CARD ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 24px 26px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title svg {
+      width: 18px;
+      height: 18px;
+      stroke: #1a56db;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .label-hint {
+      font-size: 11px;
+      font-weight: 400;
+      color: #9ca3af;
+      margin-left: 4px;
+    }
+
+    input[type="text"], textarea, select {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #111;
+      background: #fafafa;
+      transition: border-color 0.15s, background 0.15s;
+      outline: none;
+      width: 100%;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: #1a56db;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.08);
+    }
+
+    textarea { resize: vertical; min-height: 72px; }
+
+    .input-help {
+      font-size: 11.5px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      background: #1a56db;
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-primary:hover { background: #1648c0; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-primary svg {
+      width: 15px; height: 15px;
+      fill: none; stroke: white;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #6b7280;
+      border: 1.5px solid #e5e7eb;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .btn-ghost:hover { border-color: #9ca3af; color: #374151; }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #111;
+      line-height: 1;
+    }
+
+    .stat-value.blue { color: #1a56db; }
+
+    /* ── CLIENTS TABLE ── */
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .table-search {
+      position: relative;
+    }
+
+    .table-search svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px; height: 15px;
+      stroke: #9ca3af;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .table-search input {
+      padding-left: 32px;
+      width: 220px;
+      font-size: 13px;
+    }
+
+    .clients-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .client-row {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .client-row:hover {
+      border-color: #c7d7fd;
+      box-shadow: 0 2px 8px rgba(26,86,219,0.08);
+    }
+
+    .client-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a56db, #0e3fa6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .client-info { flex: 1; min-width: 0; }
+
+    .client-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .client-meta {
+      font-size: 12px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .client-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+
+    .client-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .action-btn:active { transform: scale(0.96); }
+
+    .action-btn svg {
+      width: 13px; height: 13px;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .btn-copy {
+      background: #eff6ff;
+      color: #1a56db;
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-copy:hover { background: #dbeafe; }
+    .btn-copy svg { stroke: #1a56db; }
+
+    .btn-preview {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+    }
+
+    .btn-preview:hover { background: #dcfce7; }
+    .btn-preview svg { stroke: #16a34a; }
+
+    .btn-delete {
+      background: #fff1f2;
+      color: #e11d48;
+      border: 1px solid #fecdd3;
+      padding: 7px 9px;
+    }
+
+    .btn-delete:hover { background: #ffe4e6; }
+    .btn-delete svg { stroke: #e11d48; }
+
+    .btn-email {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 1px solid #fde68a;
+    }
+    .btn-email:hover { background: #fef08a; }
+    .btn-email svg { stroke: #854d0e; fill: none; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 52px 20px;
+      color: #9ca3af;
+    }
+
+    .empty-state svg {
+      width: 48px; height: 48px;
+      stroke: #d1d5db;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin-bottom: 12px;
+    }
+
+    .empty-state p { font-size: 15px; font-weight: 500; }
+    .empty-state small { font-size: 13px; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #111827;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s;
+      z-index: 999;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    .toast svg {
+      width: 16px; height: 16px;
+      fill: none;
+      stroke: #4ade80;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── LINK PREVIEW ── */
+    .link-preview {
+      background: #f8faff;
+      border: 1px dashed #93c5fd;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #1a56db;
+      font-family: monospace;
+      word-break: break-all;
+      display: none;
+      margin-top: 14px;
+    }
+
+    .link-preview.visible { display: block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .client-desc { display: none; }
+      .topbar { padding: 0 16px; }
+      .wrapper { padding: 20px 14px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6L12 2z"/></svg>
+    </div>
+    <span class="logo-text">True<span>Mate</span> Group</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-drive" id="btnDrive" onclick="abrirCarpetaDrive()">
+      <svg viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H.01c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+        <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0-1.2 4.5h27.5z" fill="#00ac47"/>
+        <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 10.2z" fill="#ea4335"/>
+        <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2H34.4c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+        <path d="m59.8 53H32.5L18.75 76.8c1.35.8 2.9 1.2 4.5 1.2h45.5c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+        <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25 59.8 53h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+      </svg>
+      Carpeta de Videos
+    </button>
+    <span class="topbar-badge">Panel de Asesor</span>
+  </div>
+</header>
+
+<div class="wrapper">
+
+  <h1 class="page-title">Dashboard de Presentaciones</h1>
+  <p class="page-sub">Crea y gestiona los videos de pólizas para tus clientes.</p>
+
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card">
+      <div class="stat-label">Total clientes</div>
+      <div class="stat-value blue" id="statTotal">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Este mes</div>
+      <div class="stat-value" id="statMonth">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Último enviado</div>
+      <div class="stat-value" id="statLast" style="font-size:14px;font-weight:600;color:#6b7280;margin-top:6px;">—</div>
+    </div>
+  </div>
+
+  <!-- Nueva presentación -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Nueva presentación
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombre del cliente <span class="label-hint">*</span></label>
+        <input type="text" id="clienteName" placeholder="Ej: Juan Pérez" />
+      </div>
+      <div class="form-group">
+        <label>Tipo de póliza <span class="label-hint">opcional</span></label>
+        <input type="text" id="clienteTipo" placeholder="Ej: Vida, Salud, Auto…" />
+      </div>
+      <div class="form-group full">
+        <label>Link del video en Google Drive <span class="label-hint">*</span></label>
+        <div class="drive-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>
+            <strong>¿Cómo obtener el link?</strong>
+            <ol>
+              <li>Abre tu carpeta de Drive (botón arriba a la derecha)</li>
+              <li>Click derecho sobre el video → <strong>Share → Copy link</strong></li>
+              <li>Pega el link aquí abajo</li>
+            </ol>
+          </div>
+        </div>
+        <input type="text" id="clienteVideo" placeholder="https://drive.google.com/file/d/XXXXX/view" />
+        <span class="input-help">Pega el link de "Compartir" de Google Drive. Lo convierto automáticamente.</span>
+      </div>
+      <div class="form-group full">
+        <label>Nota para el cliente <span class="label-hint">opcional</span></label>
+        <textarea id="clienteDesc" placeholder="Ej: En este video explico tu póliza de vida con cobertura hasta $500k…"></textarea>
+      </div>
+    </div>
+
+    <div id="linkPreview" class="link-preview"></div>
+
+    <div class="form-actions">
+      <button class="btn-primary" onclick="crearPresentacion()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Crear y copiar link
+      </button>
+      <button class="btn-ghost" onclick="limpiarForm()">Limpiar</button>
+    </div>
+  </div>
+
+  <!-- Lista de clientes -->
+  <div class="table-header">
+    <div class="card-title" style="margin:0">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#1a56db;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Clientes (<span id="clientCount">0</span>)
+    </div>
+    <div class="table-search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Buscar cliente…" oninput="filtrarClientes()" />
+    </div>
+  </div>
+
+  <div class="clients-list" id="clientsList">
+    <!-- se llena con JS -->
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg">¡Link copiado!</span>
+</div>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────────────────────────────
+  const BASE_URL = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
+  const STORAGE_KEY = 'truemate_clientes';
+  const DRIVE_KEY  = 'truemate_drive_folder';
+
+  // ── DRIVE FOLDER ─────────────────────────────────────────────────────────────
+  function abrirCarpetaDrive() {
+    let url = localStorage.getItem(DRIVE_KEY);
+    if (!url) {
+      url = prompt('Pega el link de tu carpeta de Google Drive donde guardas los videos:\n(Solo se guarda aquí en tu navegador, no se comparte con nadie)');
+      if (!url || !url.trim()) return;
+      url = url.trim();
+      localStorage.setItem(DRIVE_KEY, url);
+    }
+    window.open(url, '_blank');
+  }
+
+  // Long-press on the Drive button to change the folder
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btnDrive');
+    if (!btn) return;
+    let holdTimer;
+    btn.addEventListener('mousedown', () => {
+      holdTimer = setTimeout(() => {
+        const current = localStorage.getItem(DRIVE_KEY) || '';
+        const url = prompt('Cambia el link de tu carpeta de Drive:', current);
+        if (url !== null) localStorage.setItem(DRIVE_KEY, url.trim());
+      }, 800);
+    });
+    btn.addEventListener('mouseup', () => clearTimeout(holdTimer));
+    btn.addEventListener('mouseleave', () => clearTimeout(holdTimer));
+  });
+
+  // ── STORAGE ──────────────────────────────────────────────────────────────────
+  function getClientes() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveClientes(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+
+  // ── GOOGLE DRIVE UTILS ───────────────────────────────────────────────────────
+  function driveToEmbed(url) {
+    // Soporta formatos:
+    // https://drive.google.com/file/d/FILE_ID/view
+    // https://drive.google.com/open?id=FILE_ID
+    const match = url.match(/\/d\/([^\/\?&]+)/) || url.match(/id=([^&]+)/);
+    if (match) return `https://drive.google.com/file/d/${match[1]}/preview`;
+    return url; // si no es Drive, devuelve tal cual (YouTube, etc.)
+  }
+
+  function extractFileId(url) {
+    const match = url.match(/\/d\/([^\/\?&]+)/) || url.match(/id=([^&]+)/);
+    return match ? match[1] : null;
+  }
+
+  // ── BUILD SHARE URL ──────────────────────────────────────────────────────────
+  function buildURL(cliente) {
+    const params = new URLSearchParams();
+    params.set('cliente', cliente.nombre);
+    if (cliente.tipo) params.set('tipo', cliente.tipo);
+    if (cliente.video) params.set('video', cliente.video);
+    if (cliente.desc) params.set('desc', cliente.desc);
+    return BASE_URL + '?' + params.toString();
+  }
+
+  // ── CREATE ───────────────────────────────────────────────────────────────────
+  function crearPresentacion() {
+    const nombre = document.getElementById('clienteName').value.trim();
+    const tipo   = document.getElementById('clienteTipo').value.trim();
+    const video  = document.getElementById('clienteVideo').value.trim();
+    const desc   = document.getElementById('clienteDesc').value.trim();
+
+    if (!nombre) { shake('clienteName'); return; }
+    if (!video)  { shake('clienteVideo'); return; }
+
+    const embedUrl = driveToEmbed(video);
+
+    const cliente = {
+      id: Date.now(),
+      nombre,
+      tipo,
+      video: embedUrl,
+      desc,
+      fecha: new Date().toISOString()
+    };
+
+    const arr = getClientes();
+    arr.unshift(cliente);
+    saveClientes(arr);
+
+    const link = buildURL(cliente);
+    navigator.clipboard.writeText(link).catch(() => {});
+    showToast('¡Presentación creada y link copiado!');
+
+    limpiarForm();
+    renderClientes();
+    updateStats();
+  }
+
+  // ── DELETE ───────────────────────────────────────────────────────────────────
+  function eliminarCliente(id) {
+    const arr = getClientes().filter(c => c.id !== id);
+    saveClientes(arr);
+    renderClientes();
+    updateStats();
+    showToast('Cliente eliminado');
+  }
+
+  // ── COPY ─────────────────────────────────────────────────────────────────────
+  function copiarLink(cliente) {
+    const link = buildURL(cliente);
+    navigator.clipboard.writeText(link)
+      .then(() => showToast('¡Link copiado al portapapeles!'))
+      .catch(() => {
+        prompt('Copia este link:', link);
+      });
+  }
+
+  // ── PREVIEW ──────────────────────────────────────────────────────────────────
+  function verPreview(cliente) {
+    window.open(buildURL(cliente), '_blank');
+  }
+
+  // ── COPIAR EMAIL ─────────────────────────────────────────────────────────────
+  function enviarEmail(cliente) {
+    const link = buildURL(cliente);
+    const tipo = cliente.tipo ? ` de ${cliente.tipo}` : '';
+
+    const textoPlano =
+`Hola ${cliente.nombre},
+
+Te comparto tu presentación de póliza${tipo} preparada especialmente para ti.
+
+Puedes verla aquí:
+${link}
+
+Cualquier duda estoy a tus órdenes.
+
+Saludos,
+Gregorio Navarro
+TrueMate Group`;
+
+    const textoHTML =
+`<p>Hola ${cliente.nombre},</p>
+<p>Te comparto tu presentación de póliza${tipo} preparada especialmente para ti.</p>
+<p>Puedes verla aquí:<br>
+<a href="${link}" style="color:#1a56db;font-weight:600;">Ver presentación →</a></p>
+<p>Cualquier duda estoy a tus órdenes.</p>
+<p>Saludos,<br>Gregorio Navarro<br>TrueMate Group</p>`;
+
+    try {
+      const item = new ClipboardItem({
+        'text/plain': new Blob([textoPlano], { type: 'text/plain' }),
+        'text/html':  new Blob([textoHTML],  { type: 'text/html'  })
+      });
+      navigator.clipboard.write([item])
+        .then(() => showToast('¡Email copiado — pega directo en Gmail!'))
+        .catch(() => {
+          navigator.clipboard.writeText(textoPlano)
+            .then(() => showToast('¡Texto de email copiado!'))
+            .catch(() => prompt('Copia este texto:', textoPlano));
+        });
+    } catch(e) {
+      navigator.clipboard.writeText(textoPlano)
+        .then(() => showToast('¡Texto de email copiado!'))
+        .catch(() => prompt('Copia este texto:', textoPlano));
+    }
+  }
+
+  // ── RENDER ───────────────────────────────────────────────────────────────────
+  function renderClientes(query = '') {
+    const arr = getClientes();
+    const list = document.getElementById('clientsList');
+    const q = query.toLowerCase();
+    const filtered = q ? arr.filter(c => c.nombre.toLowerCase().includes(q) || (c.tipo || '').toLowerCase().includes(q)) : arr;
+
+    document.getElementById('clientCount').textContent = arr.length;
+
+    if (!filtered.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <p>${arr.length === 0 ? 'Aún no tienes clientes.' : 'Sin resultados.'}</p>
+          <small>${arr.length === 0 ? 'Crea tu primera presentación arriba.' : 'Prueba otro término de búsqueda.'}</small>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(c => {
+      const initials = c.nombre.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      const fecha = new Date(c.fecha).toLocaleDateString('es', { day:'2-digit', month:'short', year:'numeric' });
+      const tipo = c.tipo ? `· ${c.tipo}` : '';
+      return `
+        <div class="client-row" data-id="${c.id}">
+          <div class="client-avatar">${initials}</div>
+          <div class="client-info">
+            <div class="client-name">${escHtml(c.nombre)}</div>
+            <div class="client-meta"><span>${fecha}</span>${tipo ? `<span>${escHtml(tipo)}</span>` : ''}</div>
+            ${c.desc ? `<div class="client-desc">${escHtml(c.desc)}</div>` : ''}
+          </div>
+          <div class="client-actions">
+            <button class="action-btn btn-email" onclick="enviarEmail(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+              <svg viewBox="0 0 24 24" width="13" height="13"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Copiar Email
+            </button>
+            <button class="action-btn btn-copy" onclick="copiarLink(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
+            </button>
+            <button class="action-btn btn-preview" onclick="verPreview(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Ver
+            </button>
+            <button class="action-btn btn-delete" onclick="eliminarCliente(${c.id})" title="Eliminar">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── STATS ────────────────────────────────────────────────────────────────────
+  function updateStats() {
+    const arr = getClientes();
+    document.getElementById('statTotal').textContent = arr.length;
+
+    const now = new Date();
+    const thisMonth = arr.filter(c => {
+      const d = new Date(c.fecha);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    document.getElementById('statMonth').textContent = thisMonth;
+
+    const last = arr[0];
+    document.getElementById('statLast').textContent = last
+      ? last.nombre.split(' ')[0]
+      : '—';
+  }
+
+  // ── HELPERS ──────────────────────────────────────────────────────────────────
+  function filtrarClientes() {
+    renderClientes(document.getElementById('searchInput').value);
+  }
+
+  function limpiarForm() {
+    ['clienteName','clienteTipo','clienteVideo','clienteDesc'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('linkPreview').classList.remove('visible');
+  }
+
+  function shake(id) {
+    const el = document.getElementById(id);
+    el.style.borderColor = '#e11d48';
+    el.style.animation = 'shake 0.3s ease';
+    setTimeout(() => { el.style.borderColor = ''; el.style.animation = ''; }, 800);
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // ── INIT ─────────────────────────────────────────────────────────────────────
+  renderClientes();
+  updateStats();
+
+  // Live link preview while typing
+  ['clienteName','clienteVideo','clienteTipo'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const nombre = document.getElementById('clienteName').value.trim();
+      const video  = document.getElementById('clienteVideo').value.trim();
+      const tipo   = document.getElementById('clienteTipo').value.trim();
+      const preview = document.getElementById('linkPreview');
+      if (nombre && video) {
+        const embed = driveToEmbed(video);
+        const params = new URLSearchParams({ cliente: nombre });
+        if (tipo) params.set('tipo', tipo);
+        params.set('video', embed);
+        preview.textContent = BASE_URL + '?' + params.toString();
+        preview.classList.add('visible');
+      } else {
+        preview.classList.remove('visible');
+      }
+    });
+  });
+</script>
+
+<style>
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    60% { transform: translateX(6px); }
+  }
+</style>
+
+</body>
+</html>
